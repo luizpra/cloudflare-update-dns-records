@@ -5,6 +5,8 @@ This Python script updates a Cloudflare DNS **A** record to your current public 
 ## Files
 
 - `update_dns.py` - updater script (Python standard library only)
+- `run.sh` - shell wrapper that loads `.env` before running the script
+- `.env.example` - template for your environment variables
 
 ## 1) Cloudflare prerequisites
 
@@ -18,13 +20,24 @@ You also need:
 
 ## 2) Configure environment variables
 
+**Option A – `.env` file (recommended)**
+
+```bash
+cp .env.example .env
+# Edit .env and fill in your values
+```
+
+Then use `run.sh` (see step 3) to load it automatically.
+
+**Option B – export manually**
+
 ```bash
 export CF_API_TOKEN="your_token_here"
 export CF_ZONE_ID="your_zone_id_here"
 export CF_RECORD_NAME="home.example.com"
 ```
 
-Optional:
+Optional variables:
 
 ```bash
 export CF_TTL="1"               # 1 = automatic
@@ -34,17 +47,25 @@ export CF_CREATE_MISSING="true" # default true
 
 ## 3) Run manually
 
+**Using the shell wrapper** (loads `.env` automatically):
+
 ```bash
-python3 update_dns.py
+./run.sh
 ```
 
 Useful optional flags:
 
 ```bash
-python3 update_dns.py --dns-only
-python3 update_dns.py --proxied
-python3 update_dns.py --no-create-missing
-python3 update_dns.py --ip 203.0.113.10
+./run.sh --dns-only
+./run.sh --proxied
+./run.sh --no-create-missing
+./run.sh --ip 203.0.113.10
+```
+
+You can also run the Python script directly (environment variables must be set):
+
+```bash
+python3 update_dns.py
 ```
 
 ## 4) Automate with cron
@@ -52,7 +73,7 @@ python3 update_dns.py --ip 203.0.113.10
 Run every 5 minutes:
 
 ```cron
-*/5 * * * * cd /path/to/auto-dns && /usr/bin/env python3 update_dns.py >> /tmp/auto-dns.log 2>&1
+*/5 * * * * cd /path/to/auto-dns && ./run.sh >> /tmp/auto-dns.log 2>&1
 ```
 
 ## Expected behavior
